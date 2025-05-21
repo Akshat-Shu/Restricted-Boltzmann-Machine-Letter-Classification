@@ -96,6 +96,7 @@ class RBM(torch.nn.Module):
         if val_data is not None:
             val_list = list(iter(val_data))
         val_ctr = 0
+        n_batches, batches, val_losses = 0, [], []
 
         for epoch in range(epochs):
             epoch_progress = tqdm.tqdm(data, desc=f"Epoch {epoch + 1}/{epochs}", leave=False, bar_format="{l_bar}{r_bar}")
@@ -109,6 +110,11 @@ class RBM(torch.nn.Module):
                     val_ctr = (val_ctr + 1) % len(val_list)
                     val_loss = self.calc_loss(val_batch)
                     epoch_progress.set_postfix({"val_loss": val_loss.item()})
+                    val_losses.append(val_loss.item())
+                    batches.append(n_batches)
+            n_batches += 1
+
+        return val_losses, batches
 
     def predict_y(self, x_data):
 
